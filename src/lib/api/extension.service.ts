@@ -141,8 +141,65 @@ function getExtension({
   });
 }
 
+interface RestPackage {
+  _id: string;
+  baseParentId: string;
+  baseParentType: string;
+  created: string;
+  creatorId: string;
+  description: string;
+  folderId: string;
+  lowerName: string;
+  name: string;
+  size: number;
+  updated: string;
+  meta: {
+    app_id: string;
+    arch: Arch;
+    baseName: string;
+    build_date: string;
+    os: OS;
+    pre_release: boolean;
+    repository_type: string;
+    repository_url: string;
+    revision: string;
+    version: string;
+  };
+}
+
+export interface OperatingSystemToRevisionMapping {
+  linux: string;
+  macosx: string;
+  win: string;
+}
+
+function getLatestPackageOperatingSystemToRevision({
+  appId,
+}: GetAppParams): Promise<OperatingSystemToRevisionMapping> {
+  return axios.get<RestPackage[]>(`app/${appId}/package`, {
+    params: {
+      limit: 3,
+      sort: 'meta.revision',
+    },
+  }).then(({ data }) => {
+    const operatingSystemToRevision: OperatingSystemToRevisionMapping = {
+      linux: '',
+      macosx: '',
+      win: '',
+    };
+    if (data.length) {
+      return data.reduce<OperatingSystemToRevisionMapping>(
+        (obj, item) => Object.assign(obj, { [item.meta.os]: item.meta.revision }),
+        operatingSystemToRevision,
+      ) as OperatingSystemToRevisionMapping;
+    }
+    return operatingSystemToRevision;
+  });
+}
+
 export {
   getExtension,
+  getLatestPackageOperatingSystemToRevision,
   hasExtensionManagerModel,
   listExtensions,
 };

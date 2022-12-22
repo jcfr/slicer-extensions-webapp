@@ -179,6 +179,7 @@ export default defineComponent({
             :src="url"
             reverse-transition="fade-transition"
             transition="fade-transition"
+            class="extension-screenshots"
           ></v-carousel-item>
         </v-carousel>
       </div>
@@ -187,3 +188,9 @@ export default defineComponent({
   </v-row>
 </v-container>
 </template>
+
+<style lang="scss" scoped>
+.extension-screenshots .v-image__image {
+  background-size: contain;
+}
+</style>
